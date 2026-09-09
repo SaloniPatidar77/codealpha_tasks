@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile.user.username }} - Loopup{% endblock %}
+
+{% block content %}
+
+<div class="card profile-card">
+
+    {% if profile.profile_image %}
+        <img
+            src="{{ profile.profile_image.url }}"
+            alt="Profile Picture"
+            class="profile-image"
+        >
+    {% else %}
+        <div class="profile-placeholder">
+            👤
+        </div>
+    {% endif %}
+
+    <h1>{{ profile.user.username }}'s Profile</h1>
+
+    <p>{{ profile.user.email }}</p>
+
+    {% if profile.bio %}
+        <p>{{ profile.bio }}</p>
+    {% else %}
+        <p>No bio yet.</p>
+    {% endif %}
+
+    <div class="profile-stats">
+        <div>
+            <strong>{{ followers.count }}</strong>
+            <span>Followers</span>
+        </div>
+
+        <div>
+            <strong>{{ following.count }}</strong>
+            <span>Following</span>
+        </div>
+
+        <div>
+            <strong>{{ post_count }}</strong>
+            <span>Posts</span>
+        </div>
+    </div>
+
+    <br>
+
+    <a href="{% url 'edit_profile' %}">
+        <button>Edit Profile</button>
+    </a>
+
+</div>
+
+
+<!-- FOLLOWERS -->
+
+<div class="card">
+
+    <h2>Followers</h2>
+
+    {% for follow in followers %}
+
+        <p>
+            👤
+            <a href="{% url 'user_profile' follow.follower.username %}">
+                {{ follow.follower.username }}
+            </a>
+        </p>
+
+    {% empty %}
+
+        <p>No followers yet.</p>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- FOLLOWING -->
+
+<div class="card">
+
+    <h2>Following</h2>
+
+    {% for follow in following %}
+
+        <p>
+            👤
+            <a href="{% url 'user_profile' follow.following.username %}">
+                {{ follow.following.username }}
+            </a>
+        </p>
+
+    {% empty %}
+
+        <p>Not following anyone yet.</p>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- POSTS -->
+
+<div class="card">
+
+    <h2>My Posts</h2>
+
+    {% for post in user_posts %}
+
+        <article>
+
+            <h3>
+                <a href="{% url 'user_profile' post.author.username %}">
+                    @{{ post.author.username }}
+                </a>
+            </h3>
+
+            {% if post.content %}
+                <p>{{ post.content }}</p>
+            {% endif %}
+
+            {% if post.image %}
+                <img
+                    src="{{ post.image.url }}"
+                    class="post-image"
+                    alt="Post image"
+                >
+            {% endif %}
+
+            {% if post.video %}
+                <video
+                    class="post-video"
+                    controls
+                >
+                    <source src="{{ post.video.url }}">
+                </video>
+            {% endif %}
+
+            <small>{{ post.created_at }}</small>
+
+        </article>
+
+        <hr>
+
+    {% empty %}
+
+        <p>You haven't posted anything yet.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

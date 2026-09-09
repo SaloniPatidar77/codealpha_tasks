@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Search - Loopup{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h1>🔍 Search Users</h1>
+    <p>Find people on Loopup.</p>
+
+    <form method="GET" action="{% url 'search_users' %}">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search username..."
+        >
+
+        <br><br>
+
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+{% if query %}
+    <div class="card">
+        <h2>Results for "{{ query }}"</h2>
+
+        {% for user in users %}
+
+            <div class="search-user">
+                <h3>
+                    <a href="{% url 'user_profile' user.username %}">
+                        @{{ user.username }}
+                    </a>
+                </h3>
+
+                {% if user.profile.bio %}
+                    <p>{{ user.profile.bio }}</p>
+                {% else %}
+                    <p>No bio added yet.</p>
+                {% endif %}
+            </div>
+
+            <hr>
+
+        {% empty %}
+
+            <p>😕 No users found.</p>
+
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

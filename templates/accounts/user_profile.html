@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ profile.user.username }} - Loopup
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <div style="text-align: center;">
+
+        {% if profile.profile_image %}
+            <img
+                src="{{ profile.profile_image.url }}"
+                alt="Profile Picture"
+                class="profile-image"
+            >
+        {% else %}
+            <div class="profile-image"
+                 style="background: #e5e7eb; margin: auto; display: flex; align-items: center; justify-content: center; font-size: 45px;">
+                👤
+            </div>
+        {% endif %}
+
+        <h1>@{{ profile.user.username }}</h1>
+
+        <p>{{ profile.bio|default:"No bio yet." }}</p>
+
+    </div>
+
+    <div class="profile-stats">
+
+        <div>
+            <strong>{{ post_count }}</strong>
+            <span>Posts</span>
+        </div>
+
+        <div>
+            <strong>{{ followers.count }}</strong>
+            <span>Followers</span>
+        </div>
+
+        <div>
+            <strong>{{ following.count }}</strong>
+            <span>Following</span>
+        </div>
+
+    </div>
+
+    {% if request.user != profile.user %}
+
+        <div style="text-align: center; margin-top: 20px;">
+
+            <form method="POST"
+                  action="{% url 'follow_user' profile.user.id %}">
+
+                {% csrf_token %}
+
+                {% if is_following %}
+                    <button type="submit">
+                        ✓ Following
+                    </button>
+                {% else %}
+                    <button type="submit">
+                        + Follow
+                    </button>
+                {% endif %}
+
+            </form>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<h2>Posts by @{{ profile.user.username }}</h2>
+
+
+{% for post in user_posts %}
+
+    <article class="card">
+
+        {% if post.content %}
+            <p class="post-content">
+                {{ post.content }}
+            </p>
+        {% endif %}
+
+        {% if post.image %}
+            <img
+                src="{{ post.image.url }}"
+                class="post-image"
+                alt="Post image"
+            >
+        {% endif %}
+
+        {% if post.video %}
+            <video
+                class="post-video"
+                controls
+            >
+                <source src="{{ post.video.url }}">
+            </video>
+        {% endif %}
+
+        <small>
+            {{ post.created_at }}
+        </small>
+
+    </article>
+
+{% empty %}
+
+    <div class="card">
+        <h3>No posts yet 📭</h3>
+        <p>This user hasn't shared anything yet.</p>
+    </div>
+
+{% endfor %}
+
+{% endblock %}

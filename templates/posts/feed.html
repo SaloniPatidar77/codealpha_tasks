@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Loopup Feed{% endblock %}
+
+
+{% block content %}
+
+<h1>Loopup Feed</h1>
+
+<a href="{% url 'create_post' %}">
+    <button>Create Post</button>
+</a>
+
+<hr>
+
+{% for post in posts %}
+
+<div class="card">
+
+    <h3>
+        <a href="{% url 'user_profile' post.author.username %}">
+            {{ post.author.username }}
+        </a>
+    </h3>
+
+    <p>{{ post.content }}</p>
+
+    {% if post.image %}
+        <img
+            src="{{ post.image.url }}"
+            alt="Post image"
+            class="post-media"
+        >
+    {% endif %}
+
+    {% if post.video %}
+        <video class="post-video" controls>
+            <source src="{{ post.video.url }}">
+        </video>
+    {% endif %}
+
+    <small>{{ post.created_at }}</small>
+
+    <div class="actions">
+
+        <form method="POST" action="{% url 'like_post' post.id %}">
+            {% csrf_token %}
+
+            {% if request.user in post.likes.all %}
+                <button type="submit">💔 Unlike</button>
+            {% else %}
+                <button type="submit">❤️ Like</button>
+            {% endif %}
+
+            <span>{{ post.likes.count }} Likes</span>
+        </form>
+
+    </div>
+
+    <hr>
+
+    <!-- Comments -->
+
+    <form method="POST" action="{% url 'add_comment' post.id %}">
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="text"
+            placeholder="Write a comment..."
+            required
+        >
+
+        <button type="submit">💬 Comment</button>
+    </form>
+
+    {% for comment in post.comments.all %}
+
+        <div class="comment">
+
+            <strong>{{ comment.user.username }}</strong>
+            {{ comment.text }}
+
+            {% if comment.user == request.user %}
+                <form
+                    method="POST"
+                    action="{% url 'delete_comment' comment.id %}"
+                    style="display: inline;"
+                >
+                    {% csrf_token %}
+                    <button type="submit">🗑️ Delete</button>
+                </form>
+            {% endif %}
+
+        </div>
+
+    {% empty %}
+
+        <p>No comments yet.</p>
+
+    {% endfor %}
+
+
+    <!-- Delete Post -->
+
+    {% if post.author == request.user %}
+
+        <form
+            method="POST"
+            action="{% url 'delete_post' post.id %}"
+        >
+            {% csrf_token %}
+            <button type="submit">Delete Post</button>
+        </form>
+
+    {% endif %}
+
+</div>
+
+{% empty %}
+
+<p>No posts yet.</p>
+
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Loopup{% endblock %}
+
+{% block content %}
+
+<div class="card" style="max-width: 600px; margin: 40px auto;">
+
+```
+<h1>Edit Profile ✨</h1>
+<p>Update your Loopup profile.</p>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if profile.profile_image %}
+        <img
+            src="{{ profile.profile_image.url }}"
+            alt="Profile Picture"
+            class="profile-image"
+        >
+    {% endif %}
+
+    <br><br>
+
+    <label>Bio</label>
+
+    <textarea
+        name="bio"
+        rows="5"
+        placeholder="Tell something about yourself..."
+    >{{ profile.bio }}</textarea>
+
+    <br><br>
+
+    <label>Profile Picture</label>
+
+    <input
+        type="file"
+        name="profile_image"
+        accept="image/*"
+    >
+
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+
+    <a href="{% url 'profile' %}">
+        Cancel
+    </a>
+
+</form>
+```
+
+</div>
+
+{% endblock %}

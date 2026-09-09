@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - Loopup{% endblock %}
+
+{% block content %}
+
+<div class="card notifications-card">
+
+    <div class="notifications-header">
+        <div>
+            <p class="eyebrow">Stay updated</p>
+            <h1>🔔 Notifications</h1>
+        </div>
+    </div>
+
+    <div class="notifications-list">
+
+        {% for notification in notifications %}
+
+            <div class="notification-item">
+
+                <div class="notification-icon">
+                    👤
+                </div>
+
+                <div class="notification-content">
+
+                    <p>
+                        <strong>{{ notification.sender.username }}</strong>
+                        {{ notification.message }}
+                    </p>
+
+                    <small>
+                        {{ notification.created_at|date:"M d, Y • h:i A" }}
+                    </small>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-notifications">
+                <div class="empty-icon">🔔</div>
+                <h3>No notifications yet</h3>
+                <p>When someone follows you, you'll see it here.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

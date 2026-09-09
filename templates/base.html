@@ -1,0 +1,219 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Loopup{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+{% if user.is_authenticated %}
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+
+        <a href="{% url 'feed' %}" class="brand">
+            Loopup
+        </a>
+
+        <div class="topbar-actions">
+
+            <a href="{% url 'notifications' %}" class="icon-link">
+                🔔
+            </a>
+
+            <a href="{% url 'profile' %}" class="mini-profile">
+
+                {% if user.profile.profile_image %}
+                    <img
+                        src="{{ user.profile.profile_image.url }}"
+                        alt="Profile"
+                    >
+                {% else %}
+                    <span>👤</span>
+                {% endif %}
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- DESKTOP APP START -->
+    <div class="app-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <nav class="sidebar-nav">
+
+                <a
+                    href="{% url 'feed' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'feed' %}active{% endif %}"
+                >
+                    <span>🏠</span>
+                    <span>Feed</span>
+                </a>
+
+                <a
+                    href="{% url 'search_users' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'search_users' %}active{% endif %}"
+                >
+                    <span>🔍</span>
+                    <span>Search</span>
+                </a>
+
+                <a
+                    href="{% url 'create_post' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'create_post' %}active{% endif %}"
+                >
+                    <span>➕</span>
+                    <span>Create</span>
+                </a>
+
+                <a
+                    href="{% url 'notifications' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"
+                >
+                    <span>🔔</span>
+                    <span>Notifications</span>
+                </a>
+
+                <a
+                    href="{% url 'profile' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+                >
+                    <span>👤</span>
+                    <span>Profile</span>
+                </a>
+
+                <a
+                    href="{% url 'logout' %}"
+                    class="nav-item logout-nav"
+                >
+                    <span>↪</span>
+                    <span>Logout</span>
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT WRAPPER START -->
+        <main class="main-content">
+
+{% else %}
+
+    <!-- GUEST HEADER -->
+    <header class="guest-topbar">
+
+        <a href="{% url 'login' %}" class="brand">
+            Loopup
+        </a>
+
+        <div class="guest-actions">
+
+            <a
+                href="{% url 'login' %}"
+                class="guest-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
+            >
+                Login
+            </a>
+
+            <a
+                href="{% url 'signup' %}"
+                class="guest-button"
+            >
+                Sign Up
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- GUEST CONTENT WRAPPER START -->
+    <main class="guest-content">
+
+{% endif %}
+
+
+    <!-- ==============================
+         ONLY ONE CONTENT BLOCK
+         ============================== -->
+
+    {% block content %}
+    {% endblock %}
+
+
+{% if user.is_authenticated %}
+
+        </main>
+        <!-- MAIN CONTENT WRAPPER END -->
+
+    </div>
+    <!-- DESKTOP APP END -->
+
+
+    <!-- MOBILE NAV -->
+    <nav class="mobile-nav">
+
+        <a
+            href="{% url 'feed' %}"
+            class="{% if request.resolver_match.url_name == 'feed' %}active{% endif %}"
+        >
+            <span>🏠</span>
+            <small>Feed</small>
+        </a>
+
+        <a
+            href="{% url 'search_users' %}"
+            class="{% if request.resolver_match.url_name == 'search_users' %}active{% endif %}"
+        >
+            <span>🔍</span>
+            <small>Search</small>
+        </a>
+
+        <a
+            href="{% url 'create_post' %}"
+            class="mobile-create {% if request.resolver_match.url_name == 'create_post' %}active{% endif %}"
+        >
+            <span>＋</span>
+        </a>
+
+        <a
+            href="{% url 'notifications' %}"
+            class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}"
+        >
+            <span>🔔</span>
+            <small>Alerts</small>
+        </a>
+
+        <a
+            href="{% url 'profile' %}"
+            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+        >
+            <span>👤</span>
+            <small>Profile</small>
+        </a>
+
+    </nav>
+
+{% else %}
+
+        </main>
+        <!-- GUEST CONTENT WRAPPER END -->
+
+{% endif %}
+
+</body>
+</html>
