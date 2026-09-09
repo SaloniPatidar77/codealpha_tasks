@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="projects-page">
+
+    <div class="dashboard-header">
+
+        <div>
+            <p class="eyebrow">Workspace</p>
+
+            <h1>Projects</h1>
+
+            <p class="dashboard-subtitle">
+                All projects you own or collaborate on.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'create_project' %}"
+            class="primary-button"
+        >
+            + Create Project
+        </a>
+
+    </div>
+
+
+    <div class="projects-toolbar">
+
+        <div class="project-search">
+            <span>⌕</span>
+
+            <input
+                type="text"
+                placeholder="Search projects..."
+            >
+        </div>
+
+        <span class="project-total">
+            {{ projects.count }} project{{ projects.count|pluralize }}
+        </span>
+
+    </div>
+
+
+    <div class="project-grid">
+
+        {% for project in projects %}
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <div class="project-icon">
+                        {{ project.name|first|upper }}
+                    </div>
+
+                    <span class="project-menu">
+                        •••
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    {{ project.name }}
+                </h3>
+
+
+                <p class="project-description">
+                    {{ project.description|default:"No description added yet." }}
+                </p>
+
+
+                <div class="project-meta">
+
+                    <span>
+                        👤 {{ project.owner.username }}
+                    </span>
+
+                    <span>
+                        👥 {{ project.members.count }}
+                    </span>
+
+                    <span>
+                        ✅ {{ project.tasks.count }}
+                    </span>
+
+                </div>
+
+
+                <div class="project-card-footer">
+
+                    <a
+                        href="{% url 'project_board' project.id %}"
+                        class="project-open"
+                    >
+                        Open Project →
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="empty-projects">
+
+                <div class="empty-project-icon">
+                    📁
+                </div>
+
+                <h3>No projects yet</h3>
+
+                <p>
+                    Create your first project and start collaborating
+                    with your team.
+                </p>
+
+                <a
+                    href="{% url 'create_project' %}"
+                    class="primary-button"
+                >
+                    + Create Project
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

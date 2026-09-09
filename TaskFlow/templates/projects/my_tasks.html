@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}My Tasks - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="my-tasks-page">
+
+    <!-- HEADER -->
+    <div class="my-tasks-header">
+
+        <div>
+            <p class="eyebrow">Personal Workspace</p>
+
+            <h1>My Tasks</h1>
+
+            <p class="my-tasks-subtitle">
+                Stay on top of everything assigned to you.
+            </p>
+        </div>
+
+        <div class="task-summary-pill">
+            <span>✓</span>
+            {{ tasks.count }} task{{ tasks.count|pluralize }}
+        </div>
+
+    </div>
+
+
+    <!-- QUICK STATS -->
+    <div class="my-task-stats">
+
+        <div class="my-task-stat">
+            <div class="my-task-stat-icon todo">
+                ○
+            </div>
+
+            <div>
+                <strong>
+                    {{ tasks|length }}
+                </strong>
+
+                <span>Total Tasks</span>
+            </div>
+        </div>
+
+
+        <div class="my-task-stat">
+            <div class="my-task-stat-icon progress">
+                ◐
+            </div>
+
+            <div>
+                <strong>
+                    {{ tasks|length }}
+                </strong>
+
+                <span>Assigned</span>
+            </div>
+        </div>
+
+
+        <div class="my-task-stat">
+            <div class="my-task-stat-icon done">
+                ✓
+            </div>
+
+            <div>
+                <strong>0</strong>
+
+                <span>Completed</span>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- TASK LIST -->
+    <div class="my-task-section">
+
+        <div class="my-task-section-header">
+
+            <div>
+                <h2>Your Tasks</h2>
+
+                <p>
+                    Tasks assigned to you across all projects.
+                </p>
+            </div>
+
+        </div>
+
+
+        {% for task in tasks %}
+
+            <article class="my-task-card">
+
+                <!-- LEFT -->
+                <div class="my-task-main">
+
+                    <div class="my-task-topline">
+
+                        <span class="task-project-label">
+                            📁 {{ task.project.name }}
+                        </span>
+
+                        <span class="priority-badge priority-{{ task.priority }}">
+                            {{ task.get_priority_display }}
+                        </span>
+
+                    </div>
+
+
+                    <h3>
+                        {{ task.title }}
+                    </h3>
+
+
+                    <p class="my-task-description">
+                        {{ task.description|default:"No description added." }}
+                    </p>
+
+
+                    <!-- META -->
+                    <div class="my-task-meta">
+
+                        <span>
+                            👤 {{ task.assigned_to.username }}
+                        </span>
+
+                        {% if task.due_date %}
+                            <span>
+                                📅 {{ task.due_date }}
+                            </span>
+                        {% endif %}
+
+                        <span>
+                            💬 {{ task.comments.count }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RIGHT -->
+                <div class="my-task-side">
+
+                    <span class="task-status-pill status-{{ task.status }}">
+                        {% if task.status == "todo" %}
+                            To Do
+                        {% elif task.status == "in_progress" %}
+                            In Progress
+                        {% else %}
+                            Done
+                        {% endif %}
+                    </span>
+
+
+                    <a
+                        href="{% url 'project_board' task.project.id %}"
+                        class="task-open-button"
+                    >
+                        Open →
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="my-task-empty">
+
+                <div class="my-task-empty-icon">
+                    ✓
+                </div>
+
+                <h3>You're all caught up!</h3>
+
+                <p>
+                    No tasks are currently assigned to you.
+                </p>
+
+                <a
+                    href="{% url 'projects_list' %}"
+                    class="primary-button"
+                >
+                    View Projects
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

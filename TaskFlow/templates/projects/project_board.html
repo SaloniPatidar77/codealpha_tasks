@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="board-page">
+
+    <!-- PROJECT HEADER -->
+    <div class="board-header">
+
+        <div>
+            <a href="{% url 'dashboard' %}" class="back-link">
+                ← Dashboard
+            </a>
+
+            <div class="board-title-row">
+                <div class="project-large-icon">
+                    {{ project.name|first|upper }}
+                </div>
+
+                <div>
+                    <p class="eyebrow">Project</p>
+                    <h1>{{ project.name }}</h1>
+
+                    <p class="board-description">
+                        {{ project.description|default:"No description added yet." }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <a
+            href="{% url 'create_task' project.id %}"
+            class="primary-button"
+        >
+            + Add Task
+        </a>
+
+    </div>
+
+
+    <!-- PROJECT INFO -->
+    <div class="project-info-bar">
+
+        <div>
+            <span>Owner</span>
+            <strong>{{ project.owner.username }}</strong>
+        </div>
+
+        <div>
+            <span>Members</span>
+            <strong>{{ project.members.count }}</strong>
+        </div>
+
+        <div>
+            <span>Tasks</span>
+            <strong>{{ tasks.count }}</strong>
+        </div>
+
+    </div>
+
+
+    <!-- MEMBERS -->
+    <div class="board-section">
+
+        <div class="section-heading">
+            <div>
+                <h2>Project Members</h2>
+                <p>People working on this project.</p>
+            </div>
+        </div>
+
+        <div class="member-row">
+
+            {% for member in project.members.all %}
+
+                <div class="member-chip">
+
+                    <div class="member-avatar">
+                        {{ member.username|first|upper }}
+                    </div>
+
+                    <span>{{ member.username }}</span>
+
+                </div>
+
+            {% empty %}
+
+                <span class="muted-text">
+                    No members yet.
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% if request.user == project.owner %}
+
+            <form
+                method="POST"
+                action="{% url 'add_project_member' project.id %}"
+                class="add-member-form"
+            >
+                {% csrf_token %}
+
+                <select name="user_id" required>
+
+                    <option value="">
+                        Select a user
+                    </option>
+
+                    {% for user in users %}
+
+                        <option value="{{ user.id }}">
+                            {{ user.username }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit">
+                    Add Member
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- KANBAN BOARD -->
+    <div class="board-section">
+
+        <div class="section-heading">
+
+            <div>
+                <h2>Project Board</h2>
+                <p>Track the progress of your team's work.</p>
+            </div>
+
+        </div>
+
+
+        <div class="kanban-board">
+
+
+            <!-- TO DO -->
+            <div class="kanban-column">
+
+                <div class="kanban-header">
+
+                    <div>
+                        <span class="column-dot todo-dot"></span>
+                        <strong>To Do</strong>
+                    </div>
+
+                    <span class="task-count">
+                        {{ tasks|length }}
+                    </span>
+
+                </div>
+
+
+                <div class="task-list">
+
+                    {% for task in tasks %}
+
+                        {% if task.status == "todo" %}
+
+                            <article class="task-card">
+
+                                <div class="task-card-top">
+
+                                    <span class="priority-badge priority-{{ task.priority }}">
+                                        {{ task.get_priority_display }}
+                                    </span>
+
+                                </div>
+
+                                <h3>{{ task.title }}</h3>
+
+                                <p>
+                                    {{ task.description|default:"No description." }}
+                                </p>
+
+
+                                {% if task.assigned_to %}
+
+                                    <div class="task-assignee">
+
+                                        <div class="task-avatar">
+                                            {{ task.assigned_to.username|first|upper }}
+                                        </div>
+
+                                        <span>
+                                            {{ task.assigned_to.username }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'update_task_status' task.id %}"
+                                    class="status-form"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <select
+                                        name="status"
+                                        onchange="this.form.submit()"
+                                    >
+
+                                        <option
+                                            value="todo"
+                                            {% if task.status == "todo" %}selected{% endif %}
+                                        >
+                                            To Do
+                                        </option>
+
+                                        <option
+                                            value="in_progress"
+                                            {% if task.status == "in_progress" %}selected{% endif %}
+                                        >
+                                            In Progress
+                                        </option>
+
+                                        <option
+                                            value="done"
+                                            {% if task.status == "done" %}selected{% endif %}
+                                        >
+                                            Done
+                                        </option>
+
+                                    </select>
+
+                                </form>
+
+
+                                <div class="task-comments">
+
+                                    <div class="task-comments-title">
+                                        💬 Comments
+                                    </div>
+
+                                    {% for comment in task.comments.all %}
+
+                                        <div class="task-comment">
+
+                                            <strong>
+                                                {{ comment.user.username }}
+                                            </strong>
+
+                                            <p>
+                                                {{ comment.text }}
+                                            </p>
+
+                                            <small>
+                                                {{ comment.created_at|date:"M d, Y h:i A" }}
+                                            </small>
+
+                                        </div>
+
+                                    {% empty %}
+
+                                        <p class="muted-text">
+                                            No comments yet.
+                                        </p>
+
+                                    {% endfor %}
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'add_task_comment' task.id %}"
+                                        class="comment-form"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="text"
+                                            name="text"
+                                            placeholder="Write a comment..."
+                                            required
+                                        >
+
+                                        <button type="submit">
+                                            Send
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </article>
+
+                        {% endif %}
+
+                    {% empty %}
+
+                        <div class="empty-column">
+                            No tasks yet.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- IN PROGRESS -->
+            <div class="kanban-column">
+
+                <div class="kanban-header">
+
+                    <div>
+                        <span class="column-dot progress-dot"></span>
+                        <strong>In Progress</strong>
+                    </div>
+
+                    <span class="task-count">
+                        {{ tasks|length }}
+                    </span>
+
+                </div>
+
+
+                <div class="task-list">
+
+                    {% for task in tasks %}
+
+                        {% if task.status == "in_progress" %}
+
+                            <article class="task-card">
+
+                                <div class="task-card-top">
+
+                                    <span class="priority-badge priority-{{ task.priority }}">
+                                        {{ task.get_priority_display }}
+                                    </span>
+
+                                </div>
+
+                                <h3>{{ task.title }}</h3>
+
+                                <p>
+                                    {{ task.description|default:"No description." }}
+                                </p>
+
+
+                                {% if task.assigned_to %}
+
+                                    <div class="task-assignee">
+
+                                        <div class="task-avatar">
+                                            {{ task.assigned_to.username|first|upper }}
+                                        </div>
+
+                                        <span>
+                                            {{ task.assigned_to.username }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'update_task_status' task.id %}"
+                                    class="status-form"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <select
+                                        name="status"
+                                        onchange="this.form.submit()"
+                                    >
+
+                                        <option value="todo">
+                                            To Do
+                                        </option>
+
+                                        <option
+                                            value="in_progress"
+                                            selected
+                                        >
+                                            In Progress
+                                        </option>
+
+                                        <option value="done">
+                                            Done
+                                        </option>
+
+                                    </select>
+
+                                </form>
+
+
+                                <div class="task-comments">
+
+                                    <div class="task-comments-title">
+                                        💬 Comments
+                                    </div>
+
+                                    {% for comment in task.comments.all %}
+
+                                        <div class="task-comment">
+
+                                            <strong>
+                                                {{ comment.user.username }}
+                                            </strong>
+
+                                            <p>
+                                                {{ comment.text }}
+                                            </p>
+
+                                            <small>
+                                                {{ comment.created_at|date:"M d, Y h:i A" }}
+                                            </small>
+
+                                        </div>
+
+                                    {% empty %}
+
+                                        <p class="muted-text">
+                                            No comments yet.
+                                        </p>
+
+                                    {% endfor %}
+
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'add_task_comment' task.id %}"
+                                        class="comment-form"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="text"
+                                            name="text"
+                                            placeholder="Write a comment..."
+                                            required
+                                        >
+
+                                        <button type="submit">
+                                            Send
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </article>
+
+                        {% endif %}
+
+                    {% empty %}
+
+                        <div class="empty-column">
+                            No tasks yet.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- DONE -->
+            <div class="kanban-column">
+
+                <div class="kanban-header">
+
+                    <div>
+                        <span class="column-dot done-dot"></span>
+                        <strong>Done</strong>
+                    </div>
+
+                    <span class="task-count">
+                        {{ tasks|length }}
+                    </span>
+
+                </div>
+
+
+                <div class="task-list">
+
+                    {% for task in tasks %}
+
+                        {% if task.status == "done" %}
+
+                            <article class="task-card">
+
+                                <div class="task-card-top">
+
+                                    <span class="priority-badge priority-{{ task.priority }}">
+                                        {{ task.get_priority_display }}
+                                    </span>
+
+                                </div>
+
+                                <h3>{{ task.title }}</h3>
+
+                                <p>
+                                    {{ task.description|default:"No description." }}
+                                </p>
+
+
+                                {% if task.assigned_to %}
+
+                                    <div class="task-assignee">
+
+                                        <div class="task-avatar">
+                                            {{ task.assigned_to.username|first|upper }}
+                                        </div>
+
+                                        <span>
+                                            {{ task.assigned_to.username }}
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'update_task_status' task.id %}"
+                                    class="status-form"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <select
+                                        name="status"
+                                        onchange="this.form.submit()"
+                                    >
+
+                                        <option value="todo">
+                                            To Do
+                                        </option>
+
+                                        <option value="in_progress">
+                                            In Progress
+                                        </option>
+
+                                        <option
+                                            value="done"
+                                            selected
+                                        >
+                                            Done
+                                        </option>
+
+                                    </select>
+
+                                </form>
+
+
+                                <div class="task-comments">
+
+                                    <div class="task-comments-title">
+                                        💬 Comments
+                                    </div>
+
+                                    {% for comment in task.comments.all %}
+
+                                        <div class="task-comment">
+
+                                            <strong>
+                                                {{ comment.user.username }}
+                                            </strong>
+
+                                            <p>
+                                                {{ comment.text }}
+                                            </p>
+
+                                            <small>
+                                                {{ comment.created_at|date:"M d, Y h:i A" }}
+                                            </small>
+
+                                        </div>
+
+                                    {% empty %}
+
+                                        <p class="muted-text">
+                                            No comments yet.
+                                        </p>
+
+                                    {% endfor %}
+
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'add_task_comment' task.id %}"
+                                        class="comment-form"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="text"
+                                            name="text"
+                                            placeholder="Write a comment..."
+                                            required
+                                        >
+
+                                        <button type="submit">
+                                            Send
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </article>
+
+                        {% endif %}
+
+                    {% empty %}
+
+                        <div class="empty-column">
+                            No tasks yet.
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

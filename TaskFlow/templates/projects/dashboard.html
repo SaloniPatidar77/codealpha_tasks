@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- HERO -->
+    <section class="dashboard-hero">
+
+        <div>
+            <span class="dashboard-kicker">
+                WORKSPACE
+            </span>
+
+            <h1>
+                Welcome back, {{ request.user.username }}
+            </h1>
+
+            <p>
+                Here's what's happening across your workspace today.
+            </p>
+        </div>
+
+        <a
+            href="{% url 'create_project' %}"
+            class="dashboard-create-btn"
+        >
+            <span>+</span>
+            New Project
+        </a>
+
+    </section>
+
+
+    <!-- STATS -->
+    <section class="dashboard-stats">
+
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon purple">
+                📁
+            </div>
+
+            <div>
+                <strong>{{ projects.count }}</strong>
+                <span>Projects</span>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon blue">
+                ✓
+            </div>
+
+            <div>
+                <strong>{{ my_tasks_count }}</strong>
+                <span>My Tasks</span>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-stat-card">
+
+            <div class="dashboard-stat-icon green">
+                👥
+            </div>
+
+            <div>
+                <strong>{{ team_members_count }}</strong>
+                <span>Team Members</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROJECTS HEADER -->
+    <section class="projects-heading">
+
+        <div>
+            <h2>Your Projects</h2>
+
+            <p>
+                Projects you own or collaborate on.
+            </p>
+        </div>
+
+        {% if projects %}
+            <span class="project-total">
+                {{ projects.count }} total
+            </span>
+        {% endif %}
+
+    </section>
+
+
+    <!-- PROJECT LIST -->
+    <section class="dashboard-project-list">
+
+        {% for project in projects %}
+
+            <article class="dashboard-project-card">
+
+                <div class="project-card-main">
+
+                    <div class="dashboard-project-icon">
+                        {{ project.name|first|upper }}
+                    </div>
+
+
+                    <div class="dashboard-project-info">
+
+                        <div class="project-title-row">
+
+                            <h3>
+                                {{ project.name }}
+                            </h3>
+
+                            {% if project.owner == request.user %}
+                                <span class="owner-badge">
+                                    Owner
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+
+                        <p>
+                            {{ project.description|default:"No description added yet." }}
+                        </p>
+
+
+                        <div class="dashboard-project-meta">
+
+                            <span>
+                                👤 {{ project.owner.username }}
+                            </span>
+
+                            <span>
+                                👥 {{ project.members.count }}
+                            </span>
+
+                            <span>
+                                ✓ {{ project.tasks.count }} task{{ project.tasks.count|pluralize }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-project-action">
+
+                    <a
+                        href="{% url 'project_board' project.id %}"
+                    >
+                        Open
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="dashboard-empty">
+
+                <div class="dashboard-empty-icon">
+                    📁
+                </div>
+
+                <h3>
+                    No projects yet
+                </h3>
+
+                <p>
+                    Create your first project and start collaborating.
+                </p>
+
+                <a
+                    href="{% url 'create_project' %}"
+                    class="dashboard-create-btn"
+                >
+                    + Create Project
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+</div>
+
+{% endblock %}

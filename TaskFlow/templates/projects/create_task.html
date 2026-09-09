@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Create Task - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="create-task-page">
+
+    <div class="create-task-header">
+
+        <a
+            href="{% url 'project_board' project.id %}"
+            class="back-link"
+        >
+            ← Back to Project Board
+        </a>
+
+        <div class="create-task-title">
+
+            <div class="create-task-icon">
+                ✓
+            </div>
+
+            <div>
+                <p class="eyebrow">Project Task</p>
+
+                <h1>Create Task</h1>
+
+                <p>
+                    Add a new task to
+                    <strong>{{ project.name }}</strong>
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="create-task-card">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if error %}
+                <div class="form-error">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+
+            <!-- TASK TITLE -->
+
+            <div class="form-group">
+
+                <label for="title">
+                    Task Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="e.g. Design homepage"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="5"
+                    placeholder="Describe what needs to be done..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="task-form-row">
+
+                <!-- ASSIGN -->
+
+                <div class="form-group">
+
+                    <label for="assigned_to">
+                        Assign To
+                    </label>
+
+                    <select
+                        id="assigned_to"
+                        name="assigned_to"
+                    >
+
+                        <option value="">
+                            Unassigned
+                        </option>
+
+                        {% for member in members %}
+
+                            <option value="{{ member.id }}">
+                                {{ member.username }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+
+                <div class="form-group">
+
+                    <label for="priority">
+                        Priority
+                    </label>
+
+                    <select
+                        id="priority"
+                        name="priority"
+                    >
+
+                        <option value="low">
+                            Low
+                        </option>
+
+                        <option
+                            value="medium"
+                            selected
+                        >
+                            Medium
+                        </option>
+
+                        <option value="high">
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- DUE DATE -->
+
+            <div class="form-group">
+
+                <label for="due_date">
+                    Due Date
+                </label>
+
+                <input
+                    type="date"
+                    id="due_date"
+                    name="due_date"
+                >
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="task-form-actions">
+
+                <a
+                    href="{% url 'project_board' project.id %}"
+                    class="secondary-button"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Create Task
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

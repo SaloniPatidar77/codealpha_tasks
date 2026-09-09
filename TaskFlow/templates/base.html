@@ -1,0 +1,211 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    {% if user.is_authenticated %}
+
+        <header class="topbar">
+
+            <a href="{% url 'dashboard' %}" class="brand">
+                TaskFlow
+            </a>
+
+            <div class="topbar-right">
+
+                <div class="topbar-search">
+                    
+                    <form
+    method="GET"
+    action="{% url 'search_projects' %}"
+    class="navbar-search"
+>
+    <span>⌕</span>
+
+    <input
+        type="text"
+        name="q"
+        placeholder="Search projects..."
+        autocomplete="off"
+    >
+</form>
+                </div>
+
+                <a
+    href="{% url 'notifications' %}"
+    class="notification-link"
+    title="Notifications"
+>
+    🔔
+</a>
+
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        {{ user.username|first|upper }}
+                    </div>
+
+                    <div class="user-info">
+                        <strong>{{ user.username }}</strong>
+                        <small>Team member</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="app-shell">
+
+            <aside class="sidebar">
+
+                <div class="sidebar-section">
+
+                    <p class="sidebar-label">
+                        WORKSPACE
+                    </p>
+
+                    <a
+                        href="{% url 'dashboard' %}"
+                        class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                    >
+                        <span>⌂</span>
+                        Dashboard
+                    </a>
+
+                    <a
+    href="{% url 'projects_list' %}"
+    class="sidebar-link"
+>
+    <span>▣</span>
+    Projects
+</a>
+
+                    <a
+    href="{% url 'my_tasks' %}"
+    class="sidebar-link"
+>
+    <span>✓</span>
+    My Tasks
+</a>
+
+                   <a
+    href="{% url 'team' %}"
+    class="sidebar-link"
+>
+    <span>◉</span>
+    Team
+</a>
+
+                </div>
+
+
+               <div class="sidebar-section">
+
+    <p class="sidebar-label">
+        ACCOUNT
+    </p>
+
+    <a
+        href="{% url 'settings' %}"
+        class="sidebar-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}"
+    >
+        <span>⚙</span>
+        Settings
+    </a>
+
+    <a
+        href="{% url 'logout' %}"
+        class="sidebar-link logout-link"
+    >
+        <span>↪</span>
+        Logout
+    </a>
+
+</div>
+
+
+                <div class="sidebar-bottom">
+
+                    <div class="workspace-card">
+
+                        <div class="workspace-icon">
+                            T
+                        </div>
+
+                        <div>
+                            <strong>TaskFlow Workspace</strong>
+                            <small>Free workspace</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <main class="main-content">
+
+                {% block content %}
+                {% endblock %}
+
+            </main>
+
+        </div>
+
+
+        <nav class="mobile-nav">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
+                <span>⌂</span>
+                <small>Home</small>
+            </a>
+
+            <a href="#" >
+                <span>▣</span>
+                <small>Projects</small>
+            </a>
+
+            <a href="#" class="mobile-create">
+                <span>＋</span>
+            </a>
+
+            <a href="#">
+                <span>✓</span>
+                <small>Tasks</small>
+            </a>
+
+            <a href="#">
+                <span>◉</span>
+                <small>Team</small>
+            </a>
+
+        </nav>
+
+    {% else %}
+
+        <main class="guest-page">
+
+            {% block guest_content %}
+            {% endblock %}
+
+        </main>
+
+    {% endif %}
+
+</body>
+</html>

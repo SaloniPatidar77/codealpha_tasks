@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - TaskFlow{% endblock %}
+
+{% block content %}
+
+<div class="notifications-page">
+
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">Updates</p>
+            <h1>Notifications</h1>
+            <p>Stay updated with your TaskFlow workspace.</p>
+        </div>
+    </div>
+
+
+    <div class="notifications-list">
+
+        {% for notification in notifications %}
+
+            <div
+                class="notification-card
+                {% if not notification.is_read %}unread{% endif %}"
+            >
+
+                <div class="notification-icon">
+                    🔔
+                </div>
+
+                <div class="notification-content">
+
+                    <p>
+                        {{ notification.message }}
+                    </p>
+
+                    <small>
+                        {{ notification.created_at|date:"M d, Y • h:i A" }}
+                    </small>
+
+                </div>
+
+                {% if not notification.is_read %}
+                    <span class="unread-dot"></span>
+                {% endif %}
+
+            </div>
+
+        {% empty %}
+
+            <div class="empty-notifications">
+
+                <div class="empty-notification-icon">
+                    🔔
+                </div>
+
+                <h3>No notifications yet</h3>
+
+                <p>
+                    You're all caught up!
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

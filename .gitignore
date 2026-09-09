@@ -7,3 +7,4 @@ __pycache__/
 *.log
 .vscode/
 media/
+TaskFlow/venv/
